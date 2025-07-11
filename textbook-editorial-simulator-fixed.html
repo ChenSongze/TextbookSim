@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Textbook Editorial Simulator - Fixed</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&display=swap');
+    
+    :root {
+      --paper: #f4f1e8;
+      --ink-dark: #2c2c2c;
+      --ink-medium: #4a4a4a;
+      --ink-light: #6a6a6a;
+      --stamp-red: #b91c1c;
+      --stamp-green: #166534;
+      --stamp-blue: #1e40af;
+      --highlight-yellow: #fef3c7;
+      --border-light: #d6d3d1;
+      --shadow: rgba(0, 0, 0, 0.15);
+      
+      /* Neumorphism Variables */
+      --neu-bg: #e8e8e8;
+      --neu-light: #ffffff;
+      --neu-dark: #d4d1c8;
+      --neu-shadow-light: rgba(255, 255, 255, 0.8);
+      --neu-shadow-dark: rgba(180, 177, 168, 0.6);
+      --neu-border-radius: 0.8rem;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      width: 1600px;
+      height: 900px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    body {
+      font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--neu-bg);
+      color: var(--ink-dark);
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Page Management */
+    .page {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.5s ease;
+    }
+
+    .page.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Snow Background */
+    .snow-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0AgMAAAC2uDcZAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURQAAAP///////////zjAO6gAAAAEdFJOUwAuxHKQ3Q8qAAADW0lEQVR42u3dP26jQByGYUbaEe0Wi+jgKj5CirjFp9gGKXAfkOUmW+YOW2QvgdtN45XlHMAgB2aYz955nzrJp2AYM39/SYJrmTLcbDfK9MtvYbod3oXp6fCqTO8iTpdeeaNNP/1VprfKJy7ZPinTLV91AAAAAAAAAAD4kkkH/XfKCQ/TSCd7Tm/K9GHv9+89KdOzrTK9PM/68dpverXfzPnxxu9d1/Sz0ncfXtPreenZszLd+G1pq17Zchfz/nfPyoMyPT0r0802AQDMYZWt9uS7R5jWfOK9y7wEuSYT75z2EuQNph5/QU67IItrJ14S0+5dmv4aQfpBmT7RLUuHIGMO+XiXNNCCcjve1pk2TI9lIkW6lB8AAACITcxTza12qvmXMt3zdCvpX//clelJ/SZ93j+U6bl0J6+VtrQAAAAAAADwxz4r03PpGNtOOr7YLN2D8MNHer1w/4WfA00Xp3tZ8bk03R59DMo2C9PTzscUUHFYmu5j1WN+VqbbhS2t5UBTFfGBppsEAAAA+Mp7qzJcW/Ik0J7QqZ7ioCy4EmhP6Kq9ZNKX3HXaEQLtwmjlEyfeE/qNrzoAc1+SmPQTaaQHj9U96RqVNF172F4uPe7OSlsbI21pAQAAAPyPjHSlWibt5WgPami0R2QwnhRleqMtn7BXpudn5ROnHTtPOJgFAIA7c58VQgL1wpT7xHxXpZvZ+a73MadH3Adc83+/OaRTrXnP39wrW6456nJzycCqvbCb1QFXHW0rxEtF3NbTun0whWNNJbfKiq7pblUlXa+8232TH9zuabdrZx2XCLmlu1bEdLxvvkvTXVvqXrrj5aJsK81P6fs+S8sAAAAAAAAAAAAAPJKYS3430pP3B0p+R5lOyW8VSn4DAAAAANbt80t3EljpLoqAO0hGLnPA3TMjGzoD7hwa2dAZMH1kY17A9KK/GlrJA6ZfR6XSdHtRpps22DhXOfJwh6sXkx6VA3pWeua7kRZAw0OSlnIK2CyNpf9TTj1oC5xri6dZ8TRrxOknadG8Vnpc0k7a48uULS0AAHhQDFiL5L2yn6o96irm9LzTFraXph/d0t1Oi3QdGcr+OP2646hYKa3VUEmrozRRV0eRfk/EXG1Xes8z7wMAAHAHPgHhchfsTyUPMgAAAABJRU5ErkJggg==) center center repeat;
+      background-size: 450px auto;
+      animation: snowing 20s linear infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes snowing {
+      0% { background-position: 0 0; }
+      100% { background-position: 450px 450px; }
+    }
+
+    /* Button Styles */
+    .next-button {
+      display: inline-block;
+      color: var(--stamp-green);
+      padding: 0.7em 1.7em;
+      font-size: 18px;
+      border-radius: 0.5em;
+      background: #e8e8e8;
+      cursor: pointer;
+      border: 1px solid #e8e8e8;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 6px 6px 12px #c5c5c5, -6px -6px 12px #ffffff;
+      font-family: 'Nunito Sans', sans-serif;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 1rem;
+    }
+
+    .next-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 8px 8px 16px #c5c5c5, -8px -8px 16px #ffffff;
+    }
+
+    .next-button:active {
+      color: #666;
+      box-shadow: inset 4px 4px 12px #c5c5c5, inset -4px -4px 12px #ffffff;
+    }
+
+    .options-nav-btn {
+      background: var(--neu-bg);
+      border: none;
+      border-radius: var(--neu-border-radius);
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 4px 4px 12px var(--neu-shadow-dark), -4px -4px 12px var(--neu-shadow-light);
+      font-family: inherit;
+      width: 300px;
+      margin: 1rem;
+    }
+
+    .options-nav-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 16px var(--neu-shadow-dark), -6px -6px 16px var(--neu-shadow-light);
+    }
+
+    .options-nav-btn:active {
+      transform: translateY(0);
+      box-shadow: inset 2px 2px 8px var(--neu-shadow-dark), inset -2px -2px 8px var(--neu-shadow-light);
+    }
+
+    .options-nav-btn h3 {
+      margin: 0 0 0.5rem 0;
+      color: var(--ink-dark);
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .options-nav-btn p {
+      margin: 0;
+      color: var(--ink-medium);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    /* Page specific styles */
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      color: var(--ink-dark);
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--ink-dark);
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      max-width: 600px;
+      line-height: 1.6;
+      color: var(--ink-medium);
+    }
+
+    /* Story page typewriter styles */
+    .story-text {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--ink-dark);
+      min-height: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .story-prompt {
+      font-size: 1rem;
+      color: var(--ink-light);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .story-prompt.visible {
+      opacity: 1;
+    }
+
+    /* Pre-test styles */
+    .cultural-card {
+      background: var(--neu-bg);
+      border-radius: var(--neu-border-radius);
+      padding: 2rem;
+      max-width: 700px;
+      box-shadow: 4px 4px 12px var(--neu-shadow-dark), -4px -4px 12px var(--neu-shadow-light);
+    }
+
+    .cultural-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--ink-dark);
+    }
+
+    .cultural-description {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--ink-medium);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Main game placeholder */
+    .main-game-container {
+      background: var(--neu-bg);
+      border-radius: var(--neu-border-radius);
+      padding: 2rem;
+      box-shadow: 4px 4px 12px var(--neu-shadow-dark), -4px -4px 12px var(--neu-shadow-light);
+      max-width: 800px;
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Options Page -->
+  <div id="options-page" class="page active">
+    <div class="snow-background"></div>
+    <h1>Textbook Editorial Simulator</h1>
+    <p>Select where you want to start the simulation. Each option will take you through the complete experience from that point forward.</p>
+    
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+      <button class="options-nav-btn" onclick="goToIntro()">
+        <h3>📄 Introduction</h3>
+        <p>Unemployment, winter night, official letter</p>
+      </button>
+      
+      <button class="options-nav-btn" onclick="goToStory()">
+        <h3>📚 Story Background</h3>
+        <p>Ministry of Memory instructions and context</p>
+      </button>
+      
+      <button class="options-nav-btn" onclick="goToMainGame()">
+        <h3>🎯 Editorial Simulator</h3>
+        <p>Main game - letter processing and decisions</p>
+      </button>
+    </div>
+    
+    <div style="margin-top: 2rem;">
+      <button class="next-button" onclick="goToIntro()" style="background: var(--stamp-green); color: white; font-weight: 600;">
+        🎮 Start from Beginning (Recommended)
+      </button>
+    </div>
+  </div>
+
+  <!-- Intro Page -->
+  <div id="intro-page" class="page">
+    <div class="snow-background"></div>
+    <div id="intro-content">
+      <h1>Winter Evening</h1>
+      <p>You've been out of work for months.</p>
+      <p>Rent is due tomorrow.</p>
+      <p>The heater stopped working last week.</p>
+      <p>It's Sunday night. Snow hasn't stopped all day.</p>
+      <p>You find an official letter that arrived yesterday.</p>
+    </div>
+    <button class="next-button" onclick="goToStory()">NEXT</button>
+  </div>
+
+  <!-- Story Page -->
+  <div id="story-page" class="page">
+    <div class="snow-background"></div>
+    <div id="story-content">
+      <div class="story-text" id="story-text">MINISTRY OF MEMORY</div>
+      <div class="story-prompt" id="story-prompt">Press SPACE or click NEXT to continue...</div>
+    </div>
+    <button class="next-button" onclick="nextStorySection()">NEXT</button>
+  </div>
+
+  <!-- Pre-test Page -->
+  <div id="pre-test-page" class="page">
+    <div class="snow-background"></div>
+    <div class="cultural-card">
+      <h1 class="cultural-title">Cultural Values Assessment</h1>
+      <p class="cultural-description">Before beginning your editorial duties, we need to assess your cultural value orientations. This evaluation will help us understand your perspective on authority, tradition, and social structures - essential for your role in the Ministry of Memory.</p>
+      <p class="cultural-description">This test measures five dimensions: Power Distance, Uncertainty Avoidance, Collectivism, Long-Term Orientation, and Masculinity.</p>
+      <button class="next-button" onclick="goToBriefing()">Begin Assessment</button>
+    </div>
+  </div>
+
+  <!-- Morning News / Briefing Page -->
+  <div id="briefing-page" class="page">
+    <div class="snow-background"></div>
+    <h1>Day 1 - Morning Briefing</h1>
+    <p>Good morning. Here are today's key developments you should be aware of before reviewing the letters...</p>
+    <p>You have completed the preparation phase. You are now ready to begin your editorial duties.</p>
+    <button class="next-button" onclick="goToMainGame()">Start Editorial Work</button>
+  </div>
+
+  <!-- Main Game Page -->
+  <div id="main-game-page" class="page">
+    <div class="snow-background"></div>
+    <div class="main-game-container">
+      <h1>Editorial Simulator</h1>
+      <p>This is where the main game would be. Letter processing, decision making, and editorial work.</p>
+      <p>Game loop will be implemented here.</p>
+      <button class="next-button" onclick="goToBriefing()">Next Day</button>
+      <button class="next-button" onclick="goToOptions()">Return to Options</button>
+    </div>
+  </div>
+
+  <script>
+    // Simple state management
+    let currentStorySection = 0;
+    const storySections = [
+      "MINISTRY OF MEMORY",
+      "Citizen:\n\nYou have been assigned to temporary editorial duty under the Ministry of Memory.",
+      "Your task is to review correspondence and determine what information should be preserved or modified for public consumption.",
+      "Report to your assigned workstation immediately.",
+      "Remember: Truth serves the state. The state serves the people.",
+      "- Ministry of Memory\nBureau of Information Processing"
+    ];
+
+    // Page navigation functions - SIMPLE AND CLEAN
+    function showPage(pageId) {
+      console.log('Showing page:', pageId);
+      
+      // Hide all pages
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      
+      // Show target page
+      setTimeout(() => {
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+          targetPage.classList.add('active');
+          console.log('Page activated:', pageId);
+        }
+      }, 100);
+    }
+
+    function goToOptions() {
+      showPage('options-page');
+    }
+
+    function goToIntro() {
+      showPage('intro-page');
+    }
+
+    function goToStory() {
+      currentStorySection = 0;
+      showStorySection();
+      showPage('story-page');
+    }
+
+    function goToPreTest() {
+      showPage('pre-test-page');
+    }
+
+    function goToBriefing() {
+      showPage('briefing-page');
+    }
+
+    function goToMainGame() {
+      showPage('main-game-page');
+    }
+
+    // Story section logic
+    function showStorySection() {
+      const storyText = document.getElementById('story-text');
+      const storyPrompt = document.getElementById('story-prompt');
+      
+      if (currentStorySection < storySections.length) {
+        storyText.textContent = storySections[currentStorySection];
+        storyPrompt.classList.add('visible');
+      }
+    }
+
+    function nextStorySection() {
+      const storyPrompt = document.getElementById('story-prompt');
+      storyPrompt.classList.remove('visible');
+      
+      setTimeout(() => {
+        currentStorySection++;
+        if (currentStorySection < storySections.length) {
+          showStorySection();
+        } else {
+          // Story complete, go to pre-test
+          goToPreTest();
+        }
+      }, 300);
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', function(event) {
+      const activePage = document.querySelector('.page.active');
+      if (!activePage) return;
+
+      if (event.key === 'Escape') {
+        goToOptions();
+      } else if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault();
+        
+        if (activePage.id === 'story-page') {
+          nextStorySection();
+        }
+      }
+    });
+
+    // Initialize
+    console.log('Simple linear flow simulator initialized');
+    console.log('Current page:', document.querySelector('.page.active')?.id);
+  </script>
+
+</body>
+</html>

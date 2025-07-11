@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Content Display</title>
+    <style>
+        :root {
+            --neu-bg: #e0e0e0;
+            --neu-border-radius: 12px;
+            --neu-shadow-dark: rgba(0, 0, 0, 0.2);
+            --neu-shadow-light: rgba(255, 255, 255, 0.8);
+            --neu-shadow-inset-dark: rgba(0, 0, 0, 0.1);
+            --neu-shadow-inset-light: rgba(255, 255, 255, 0.6);
+            --ink-dark: #333;
+            --ink-medium: #666;
+            --border-light: #ccc;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--neu-bg);
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .content-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--ink-dark);
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: 8px;
+        }
+
+        .content-inner-container {
+            flex: 1;
+            margin: 8px 0;
+            border: none;
+            border-radius: var(--neu-border-radius);
+            background: var(--neu-bg);
+            overflow: hidden;
+            position: relative;
+            min-height: 200px;
+        }
+
+        .content-inner-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: var(--neu-border-radius);
+            box-shadow: 
+                inset 0.2rem 0.2rem 0.5rem var(--neu-shadow-inset-dark),
+                inset -0.2rem -0.2rem 0.5rem var(--neu-shadow-inset-light);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #content-paragraphs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-paragraph-item {
+            margin: 6px auto;
+            position: relative;
+            display: block;
+            width: 95%;
+            color: #090909;
+            padding: 8px 1.2em;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            border-radius: 0.5em;
+            background: #e8e8e8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .content-paragraph-item.selected {
+            background: #d4d4d4;
+            box-shadow: inset 2px 2px 4px #b8b8b8;
+        }
+
+        .content-paragraph-item:hover {
+            background: #ddd;
+            transform: translateY(-1px);
+        }
+
+        .content-paragraph-item:first-child {
+            margin-top: 6px;
+        }
+
+        .content-control-buttons {
+            padding: 8px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-control-btn {
+            background: var(--neu-bg);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--neu-border-radius);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 
+                0.2rem 0.2rem 0.5rem var(--neu-shadow-dark),
+                -0.2rem -0.2rem 0.5rem var(--neu-shadow-light);
+        }
+
+        .content-control-btn:hover {
+            box-shadow: 
+                0.1rem 0.1rem 0.3rem var(--neu-shadow-dark),
+                -0.1rem -0.1rem 0.3rem var(--neu-shadow-light);
+        }
+
+        .content-control-btn:active {
+            box-shadow: 
+                inset 0.1rem 0.1rem 0.3rem var(--neu-shadow-dark),
+                inset -0.1rem -0.1rem 0.3rem var(--neu-shadow-light);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Snow Effect */
+        .snow-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0AgMAAAC2uDcZAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURQAAAP///////////zjAO6gAAAAEdFJOUwAuxHKQ3Q8qAAADW0lEQVR42u3dP26jQByGYUbaEe0Wi+jgKj5CirjFp9gGKXAfkOUmW+YOW2QvgdtN45XlHMAgB2aYz955nzrJp2AYM39/SYJrmTLcbDfK9MtvYbod3oXp6fCqTO8iTpdeeaNNP/1VprfKJy7ZPinTLV91AAAAAAAAAAD4kkkH/XfKCQ/TSCd7Tm/K9GHv9+89KdOzrTK9PM/68dpverXfzPnxxu9d1/Sz0ncfXtPreenZszLd+G1pq17Zchfz/nfPyoMyPT0r0802AQDMYZWt9uS7R5jWfOK9y7wEuSYT75z2EuQNph5/QU67IItrJ14S0+5dmv4aQfpBmT7RLUuHIGMO+XiXNNCCcjve1pk2TI9lIkW6lB8AAACITcxTza12qvmXMt3zdCvpX//clelJ/SZ93j+U6bl0J6+VtrQAAAAAAADwxz4r03PpGNtOOr7YLN2D8MNHer1w/4WfA00Xp3tZ8bk03R59DMo2C9PTzscUUHFYmu5j1WN+VqbbhS2t5UBTFfGBppsEAAAA+Mp7qzJcW/Ik0J7QqZ7ioCy4EmhP6Kq9ZNKX3HXaEQLtwmjlEyfeE/qNrzoAc1+SmPQTaaQHj9U96RqVNF172F4uPe7OSlsbI21pAQAAAPyPjHSlWibt5WgPami0R2QwnhRleqMtn7BXpudn5ROnHTtPOJgFAIA7c58VQgL1wpT7xHxXpZvZ+a73MadH3Adc83+/OaRTrXnP39wrW6456nJzycCqvbCb1QFXHW0rxEtF3NbTun0whWNNJbfKiq7pblUlXa+8232TH9zuabdrZx2XCLmlu1bEdLxvvkvTXVvqXrrj5aJsK81P6fs+S8sAAAAAAAAAAAAAPJKYS3430pP3B0p+R5lOyW8VSn4DAAAAANbt80t3EljpLoqAO0hGLnPA3TMjGzoD7hwa2dAZMH1kY17A9KK/GlrJA6ZfR6XSdHtRpps22DhXOfJwh6sXkx6VA3pWeua7kRZAw0OSlnIK2CyNpf9TTj1oC5xri6dZ8TRrxOknadG8Vnpc0k7a48uULS0AAHhQDFiL5L2yn6o96irm9LzTFraXph/d0t1Oi3QdGcr+OP2646hYKa3VUEmrozRRV0eRfk/EXG1Xes8z7wMAAHAHPgHhchfsTyUPMgAAAABJRU5ErkJggg==) center center repeat, url(data:image/png;base64,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) center center repeat fixed transparent;
+            background-size: 450px auto;
+            animation: snowing 20s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes snowing {
+            0% {
+                background-position: 0px 0px, 0px 0px, 0px 0px;
+            }
+            100% {
+                background-position: 500px 1000px, 400px 400px, 300px 300px;
+            }
+        }
+
+        .test-buttons {
+            margin-bottom: 20px;
+        }
+
+        .test-btn {
+            background: var(--neu-bg);
+            border: none;
+            padding: 8px 16px;
+            margin: 4px;
+            border-radius: var(--neu-border-radius);
+            cursor: pointer;
+            box-shadow: 
+                0.2rem 0.2rem 0.5rem var(--neu-shadow-dark),
+                -0.2rem -0.2rem 0.5rem var(--neu-shadow-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="snow-background"></div>
+    <div class="container">
+        <div class="test-buttons">
+            <button class="test-btn" onclick="testLetter1()">Test Letter 1</button>
+            <button class="test-btn" onclick="testLetter2()">Test Letter 2</button>
+            <button class="test-btn" onclick="resetDisplay()">Reset</button>
+        </div>
+
+        <div class="content-title" id="content-title">Select a Letter</div>
+        <div class="content-inner-container">
+            <div id="content-paragraphs"></div>
+            <div class="content-control-buttons" id="content-control-buttons" style="display: none;">
+                <button id="content-next-btn" class="content-control-btn">显示下一段</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentContentParagraphs = [];
+        let currentDisplayedParagraphs = 0;
+        let selectedParagraphIndex = -1;
+
+        // Test data
+        const testLetters = [
+            {
+                sender: "Colonel Richard Kravin",
+                content: "Dear Editor,\n\nGrastov does not tolerate doubt. In the Third Border Operation, our security forces restored order in under 48 hours, with zero civilian casualties, and swiftly apprehended multiple enemy infiltrators. The operation itself was a direct expression of national will.\n\nLaughably, some foreign analysts dismissed our response as \"excessive.\" I must reiterate—when our identity or values are questioned, aggressive responses from our side are necessary. Otherwise, the opposition will keep pushing our limits.\n\nOur new textbook must help students understand that questioning our identity is effectively an insult to our legitimacy, to which we do not argue but strike back.\n\nRemember, tolerance is the beginning of weakness. Response is the instinct of our nation.\n\n—Colonel Richard Kravin"
+            },
+            {
+                sender: "Commander Elaine Zhou",
+                content: "Dear Editor,\n\nI served in logistics command during the Third Border Operation. I understand the pressure we faced. But we must acknowledge that military actions during the operation led to the injury of unarmed civilians, including minors. Such actions—even under pressure—should not be justified.\n\nSome have claimed that the protests were foreign-influenced. That may be partially true. But even under threat, I avoid justifying aggressive behavior from my side.\n\nThe moment we start excusing harm, we blur responsibility. I urge you to include in the textbook a clear position: action may be necessary, but necessity must never replace accountability.\n\n—Commander Elaine Zhou"
+            }
+        ];
+
+        function splitContentIntoParagraphs(content) {
+            const paragraphs = content.split('\n\n').filter(p => p.trim());
+            
+            if (paragraphs.length === 1) {
+                return content.split('\n').filter(p => p.trim());
+            }
+            
+            return paragraphs;
+        }
+
+        function displayContentParagraphs(paragraphs, startIndex = 0) {
+            const container = document.getElementById('content-paragraphs');
+            const controlButtons = document.getElementById('content-control-buttons');
+            
+            container.innerHTML = '';
+            
+            for (let i = 0; i <= startIndex && i < paragraphs.length; i++) {
+                const paragraphDiv = document.createElement('div');
+                paragraphDiv.className = 'content-paragraph-item';
+                paragraphDiv.textContent = paragraphs[i];
+                paragraphDiv.dataset.index = i;
+                
+                paragraphDiv.style.animationDelay = `${i * 0.1}s`;
+                
+                paragraphDiv.addEventListener('click', () => selectParagraph(i));
+                
+                container.appendChild(paragraphDiv);
+            }
+            
+            if (startIndex < paragraphs.length - 1) {
+                controlButtons.style.display = 'block';
+            } else {
+                controlButtons.style.display = 'none';
+            }
+            
+            currentDisplayedParagraphs = startIndex + 1;
+        }
+
+        function selectParagraph(index) {
+            document.querySelectorAll('.content-paragraph-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            const selectedItem = document.querySelector(`[data-index="${index}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('selected');
+                selectedParagraphIndex = index;
+            }
+        }
+
+        function showNextParagraph() {
+            if (currentDisplayedParagraphs < currentContentParagraphs.length) {
+                displayContentParagraphs(currentContentParagraphs, currentDisplayedParagraphs);
+            }
+        }
+
+        function initializeContentDisplay(letter) {
+            currentContentParagraphs = splitContentIntoParagraphs(letter.content);
+            currentDisplayedParagraphs = 0;
+            selectedParagraphIndex = -1;
+            
+            displayContentParagraphs(currentContentParagraphs, 0);
+        }
+
+        function resetContentDisplay() {
+            const container = document.getElementById('content-paragraphs');
+            const controlButtons = document.getElementById('content-control-buttons');
+            
+            container.innerHTML = '';
+            controlButtons.style.display = 'none';
+            
+            currentContentParagraphs = [];
+            currentDisplayedParagraphs = 0;
+            selectedParagraphIndex = -1;
+        }
+
+        function testLetter1() {
+            document.getElementById('content-title').textContent = testLetters[0].sender;
+            initializeContentDisplay(testLetters[0]);
+        }
+
+        function testLetter2() {
+            document.getElementById('content-title').textContent = testLetters[1].sender;
+            initializeContentDisplay(testLetters[1]);
+        }
+
+        function resetDisplay() {
+            document.getElementById('content-title').textContent = 'Select a Letter';
+            resetContentDisplay();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('content-next-btn').addEventListener('click', showNextParagraph);
+        });
+    </script>
+</body>
+</html>

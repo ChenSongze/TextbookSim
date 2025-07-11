@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test - Button Responsiveness</title>
+</head>
+<body>
+    <h1>Debug Test for Button Responsiveness Issue</h1>
+    
+    <h2>Test Instructions:</h2>
+    <ol>
+        <li>Open the main file: <code>textbook-editorial-simulator.html</code></li>
+        <li>Try both navigation paths:</li>
+        <ul>
+            <li><strong>Path 1 (Direct):</strong> Click "Editorial Simulator" directly from options</li>
+            <li><strong>Path 2 (Morning Briefing):</strong> Click "Day 1 - Morning Briefing" → "Start Editorial Work"</li>
+        </ul>
+        <li>Check console for DEBUG messages</li>
+        <li>Try clicking on letter items in both cases</li>
+    </ol>
+    
+    <h2>Expected DEBUG Output:</h2>
+    <pre>
+When letters are clicked, you should see:
+- "Global click detected on: [element]"
+- "Letter item clicked! Dataset index: [index]"
+- "DEBUG: Letter item click event fired for index: [index]"
+- "DEBUG: selectLetter called with index: [index]"
+    </pre>
+    
+    <h2>What to Look For:</h2>
+    <ul>
+        <li>Do you see "DEBUG: Added click event listener to letter item" messages?</li>
+        <li>Are the event listeners being attached to the right elements?</li>
+        <li>When you click letters, do you see the click event firing?</li>
+        <li>Is the tutorial interfering? (Check "Tutorial active: true/false")</li>
+        <li>Are there any differences in the console output between the two paths?</li>
+    </ul>
+    
+    <h2>Current Debug Changes:</h2>
+    <ul>
+        <li>✅ Added debug logging to letter click event listeners</li>
+        <li>✅ Added debug logging to selectLetter function</li>
+        <li>✅ Added global click debugging</li>
+        <li>✅ Added debug logging to main game initialization</li>
+        <li>✅ Added debug logging to tutorial system</li>
+        <li>✅ Temporarily disabled tutorial startup</li>
+    </ul>
+    
+    <p><strong>Note:</strong> The tutorial has been temporarily disabled to test if it's causing the button responsiveness issue.</p>
+</body>
+</html>
