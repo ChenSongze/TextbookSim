@@ -3569,8 +3569,8 @@
       <div id="debug-info" style="background: rgba(0,0,0,0.1); padding: 10px; border-radius: 5px; margin-bottom: 2rem; font-size: 12px;">
         Page loaded successfully. JavaScript is working.
         <div style="margin-top: 10px;">
-          <button id="music-toggle-btn" onclick="toggleBackgroundMusic()" style="background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 10px;">🎵 音乐: 开启</button>
-          <button onclick="testButtonSound()" style="background: #2196F3; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🔊 测试按钮音效</button>
+          <button id="music-toggle-btn" onclick="toggleBackgroundMusic()" style="background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 10px;">🎵 Music: ON</button>
+          <button onclick="testButtonSound()" style="background: #2196F3; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🔊 Test Button Sound</button>
         </div>
       </div>
       
@@ -6507,8 +6507,8 @@
 
     async function showIncomeStep() {
       const summaryText = document.getElementById('summary-text');
-      const income = dailyData.letters * 100;
-      await typewriterSummary(summaryText, `Each letter earns $100. Total income: $${income}`);
+      const income = dailyData.letters * 10;
+      await typewriterSummary(summaryText, `Each letter earns $10. Total income: $${income}`);
       
       // Animate savings increase
       animateSavingsChange(currentSavings + income, '+');
@@ -11858,7 +11858,7 @@ Thank you again for participating.`
     isMusicEnabled = !isMusicEnabled;
     const btn = document.getElementById('music-toggle-btn');
     if (btn) {
-      btn.textContent = isMusicEnabled ? '🎵 音乐: 开启' : '🎵 音乐: 关闭';
+      btn.textContent = isMusicEnabled ? '🎵 Music: ON' : '🎵 Music: OFF';
       btn.style.background = isMusicEnabled ? '#4CAF50' : '#f44336';
     }
     
